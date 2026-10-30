@@ -1,8 +1,10 @@
 # Learning notes
 
-This is a learning project, so these notes explain the Go ideas the scanner uses, one snippet at a time. Every snippet comes from the code, so you can open the file next to this page and find it. Where a snippet has `...`, lines have been left out to keep it short.
+These are my notes for learning Go. Each section takes one idea the scanner uses and explains it with a snippet from the code. Anyone else learning Go is welcome to use them.
 
-Read the code in this order: `ports.go`, then `scanner.go`, then `main.go`. If you are new to Go, work through [A Tour of Go](https://go.dev/tour) alongside these notes.
+Every snippet comes from the code, so I can open the file next to these notes and find it. Where a snippet has `...`, lines have been left out to keep it short.
+
+My reading order is `ports.go`, then `scanner.go`, then `main.go`, with [A Tour of Go](https://go.dev/tour) alongside.
 
 ## The picture first
 
@@ -108,11 +110,11 @@ seen[port] = true
 
 Go has no set type, so a map with `true` values does the job. Adding the same port twice leaves one key. Map order is random in Go, so `ParsePorts` sorts the ports afterwards, and the scan is the same every time.
 
-## Try it yourself
+## Exercises for me
 
-Each of these teaches one thing. Run `go test ./...` after each change.
+Each one teaches a single thing. I run `go test ./...` after each change.
 
-1. **See the workers work.** Run `-workers 1`, then `-workers 100`, on the same ports. On your own machine the gap is small, because a closed port refuses at once. It grows when each port has to wait for a timeout.
+1. **See the workers work.** Run `-workers 1`, then `-workers 100`, on the same ports. On my own machine the gap is small, because a closed port refuses at once. It grows when each port has to wait for a timeout.
 2. **Break the feeder on purpose.** Delete the `case <-ctx.Done()` from the feeder's `select` and run the tests. They still pass, because the scan returns anyway. A goroutine is left stuck, and nothing in the tests notices. Write a test that catches it, for example by comparing `runtime.NumGoroutine()` before and after.
 3. **Make `results` buffered.** Change it to `make(chan Result, 100)`. Nothing visible changes. Work out why, and what a buffer is for.
 4. **Add a `-verbose` flag** that also prints the closed ports. Start in `run` in `main.go`.
@@ -121,4 +123,4 @@ Each of these teaches one thing. Run `go test ./...` after each change.
 
 ## Where the tests are
 
-The tests are part of the lesson. Their names read as sentences about behaviour, such as `TestAClosedPortIsReportedAsClosed`. They open real listeners on your own machine, so they need no network.
+The tests are part of the lesson. Their names read as sentences about behaviour, such as `TestAClosedPortIsReportedAsClosed`. They open real listeners on my own machine, so they need no network.

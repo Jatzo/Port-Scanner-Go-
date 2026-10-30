@@ -4,6 +4,22 @@ A simple project coded in Go to practise understanding it.
 
 It is a small concurrent TCP port scanner. Give it a host and a range of ports, and it tells you which ports accept a connection. The aim is to learn how Go handles goroutines, channels, contexts and tests, so the code carries comments that explain why each piece is there.
 
+## How it works
+
+```mermaid
+flowchart TB
+    A["Read the flags, port list and host"] --> B["Feeder sends each port"]
+    B -->|port| C[("jobs channel")]
+    C -->|port| D["Workers dial the ports"]
+    D -->|Result| E[("results channel")]
+    E --> F["Scan collects and sorts"]
+    F --> G["Open ports to stdout, summary to stderr"]
+    X["Ctrl+C cancels the context"] -.-> B
+    X -.-> D
+```
+
+The feeder, the workers and the collecting loop all run at the same time. The two channels are the pipes between them. A Ctrl+C reaches the feeder and the workers through the context, so the scan stops and the results are marked partial.
+
 ## What it does
 
 - Scans a host for open TCP ports, many at once, using a fixed pool of worker goroutines.
@@ -49,7 +65,7 @@ The tests open real listeners on your own machine, so they need no network.
 
 ## Learning notes
 
-[LEARNING.md](LEARNING.md) explains the Go ideas in this code one snippet at a time, with exercises at the end. Start there if you are reading this to learn.
+[LEARNING.md](LEARNING.md) holds my notes on the Go ideas in this code, one snippet at a time, with exercises at the end. Anyone else learning Go is welcome to use them.
 
 ## Where to look first
 
